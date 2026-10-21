@@ -1,0 +1,23 @@
+Expected reference results for the included Solomon 25-customer instances
+===========================================================================
+
+Instance       Customers    Vehicles    Total distance
+-------------------------------------------------------
+C101_25        25           3           191.3
+R101_25        25           8           617.1
+RC101_25       25           4           461.1
+
+Notes
+-----
+1. These are the commonly reported reference values for the Solomon 25-customer
+   subinstances formed by keeping the depot and customers 1 through 25.
+2. Distances are Euclidean and the reported objective is rounded to one decimal.
+3. A small last-digit difference may occur if an implementation rounds every arc
+   before summation instead of rounding only the final route-set distance.
+4. The values above are public benchmark reference values.
+
+Data source
+-----------
+The customer data were taken from the public PyVRP/VRPLIB mirror of the original
+Solomon VRPTW instances:
+https://github.com/PyVRP/VRPLIB/tree/main/tests/data/cvrplib/Vrp-Set-Solomon

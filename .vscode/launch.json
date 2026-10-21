@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [{
+        "type": "java",
+        "name": "Run BPC",
+        "request": "launch",
+        "mainClass": "Test.Main",
+        "cwd": "${workspaceFolder}",
+        "preLaunchTask": "BPC: compile",
+        "classPaths": [
+            "${workspaceFolder}/.build/classes",
+            "D:/develop tools/CPlEX 20.1/cplex/lib/cplex.jar"
+        ],
+        "vmArgs": "--enable-native-access=ALL-UNNAMED -Djava.library.path=\"D:/develop tools/CPlEX 20.1/cplex/bin/x64_win64\""
+    }]
+}

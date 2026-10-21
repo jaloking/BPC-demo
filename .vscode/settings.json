@@ -1,0 +1,20 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.outputPath": "out",
+    "java.project.referencedLibraries": [
+        "D:/develop tools/CPlEX 20.1/cplex/lib/cplex.jar"
+    ],
+    "java.debug.settings.forceBuildBeforeLaunch": false,
+    "java.jdt.ls.java.home": "D:/develop tools/JDK-25",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-25",
+            "path": "D:/develop tools/JDK-25",
+            "default": true
+        }
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.import.generatesMetadataFilesAtProjectRoot": true
+}
