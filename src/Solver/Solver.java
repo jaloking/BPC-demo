@@ -37,6 +37,8 @@ public class Solver {
     public boolean solve() throws IloException {
         if (data == null) throw new IllegalStateException("求解器缺少实例数据。");
         if (!(time_limit_seconds > 0.0)) throw new IllegalArgumentException("时间上限必须大于 0。");
+        if (data.customer_num > Integer.SIZE)
+            throw new IllegalArgumentException("int visited supports at most 32 customers.");
         node_queue = new PriorityQueue<>();
         upper_bound = Double.POSITIVE_INFINITY;
         best_solution = null;

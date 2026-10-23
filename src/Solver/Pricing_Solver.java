@@ -35,12 +35,14 @@ public class Pricing_Solver {
     public boolean solve(MP mp) {
         clear();
         data = mp.data;
+        if (mp.dual_cuts.length > Integer.SIZE)
+            throw new IllegalArgumentException("int cut_parity supports at most 32 active cuts.");
         labels_at_node = new ArrayList<>();
         for (int i = 0; i < data.node_num; i++) labels_at_node.add(new ArrayList<>());
         Label root = new Label();
         root.end_node = 0;
-        root.visited = new boolean[data.node_num];
-        root.cut_parity = new boolean[mp.dual_cuts.length];
+        root.visited = 0;
+        root.cut_parity = 0;
         root.service_start_time = data.ready_time[0];
         ArrayDeque<Label> pending = new ArrayDeque<>();
         pending.add(root);

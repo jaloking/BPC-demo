@@ -63,7 +63,7 @@ public class Node_Solver {
             }
             if (!mp.is_integral()) {
                 java.util.ArrayList<Model.Subset_Row_Cut> cuts = new Cut_Separator().separate(mp,
-                        Math.min(cuts_per_round, Math.min(max_cuts_per_node,
+                        Math.min(cuts_per_round, Math.min(Math.min(max_cuts_per_node, Integer.SIZE),
                                 mp.max_model_columns - data.customer_num - 2) - node.cuts.size()), deadline_nanos);
                 if (!cuts.isEmpty()) {
                     mp.add_cuts(cuts);

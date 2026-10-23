@@ -24,4 +24,4 @@ Route 7: [0, 2, 21, 3, 24, 0]
 Route 8: [0, 12, 9, 20, 1, 0]
   Cost: 83.39940616966133, Load: 54
   Service start times: [0.0, 63.0, 98.49509756796392, 126.0, 161.0, 186.23154621172782]
-Algorithm: BPC, Status: Optimal, Lower bound: 618.3299155462686, Relative gap: 0.0, Nodes: 1
+Algorithm: BPC, Status: Optimal, Lower bound: 618.3299155462686, Relative gap: 0.0, Nodes: 1, Solve time (s): 0.006611

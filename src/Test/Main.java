@@ -22,14 +22,17 @@ public class Main {
         Solver solver = new Solver();
         solver.data = FIO.read_instance(input);
         solver.time_limit_seconds = 300.0;
+        long start = System.nanoTime();
         boolean feasible = solver.solve();
+        double elapsed = (System.nanoTime() - start) / 1.0e9;
         String status = solver.optimal ? "Optimal"
                 : solver.timed_out ? (feasible ? "Time limit, feasible" : "Time limit, no solution")
                 : "Infeasible";
         String summary = "Algorithm: BPC, Status: " + status
                 + ", Lower bound: " + solver.lower_bound
                 + ", Relative gap: " + Helper.relative_gap(solver.lower_bound, solver.upper_bound)
-                + ", Nodes: " + solver.solved_node_count;
+                + ", Nodes: " + solver.solved_node_count
+                + ", Solve time (s): " + String.format(java.util.Locale.ROOT, "%.6f", elapsed);
         if (feasible) FIO.write_solution(solver.best_solution, output);
         else {
             Files.createDirectories(Paths.get(output).toAbsolutePath().getParent());
@@ -38,6 +41,7 @@ public class Main {
         Files.write(Paths.get(output), Arrays.asList(summary), StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         System.out.println(Paths.get(input).getFileName() + ": " + status
                 + (feasible ? ", cost=" + solver.upper_bound + ", vehicles=" + solver.best_solution.routes.size() : "")
-                + ", nodes=" + solver.solved_node_count);
+                + ", nodes=" + solver.solved_node_count
+                + ", time=" + String.format(java.util.Locale.ROOT, "%.6fs", elapsed));
     }
 }

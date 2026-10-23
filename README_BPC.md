@@ -202,14 +202,16 @@ Test.Main
 主要字段：
 
 - `end_node`：当前末端节点；
-- `visited`：已经访问的客户；
+- `visited`：`int` 位掩码，第 i-1 位表示客户 i 是否已访问；
 - `load`：累计载重；
 - `service_start_time`：末端节点的服务开始时间；
 - `reduced_cost`：累计 reduced cost；
 - `predecessor`：前驱 label；
-- `cut_parity`：每条割已经访问客户数的奇偶状态。
+- `cut_parity`：`int` 位掩码，第 c 位保存第 c 条活跃割已经访问客户数的奇偶状态。
 
 `Label` 不直接保存完整 path，也不单独保存 actual cost。完整路径通过 `predecessor` 逐层还原。
+
+`visited` 不再分配布尔数组：成员查询使用 `(visited & bit) != 0`，扩展更新使用 `visited | bit`，子集判断使用 `(visited & other.visited) == visited`。支持最多 32 名客户（仓库不占位），超过此规模在 Solver 入口明确报错；`cut_parity` 也使用 int 位掩码，最多支持 32 条活跃割，默认割预算仍为 20 条。
 
 主要方法：
 
@@ -451,7 +453,7 @@ String result_dir = "Results";
 | 方法 | 作用 |
 | --- | --- |
 | `main(String[] args)` | 设置目录和实例名称，依次调用 BPC；不从 args 读取路径。 |
-| `run_bpc(String input, String output)` | 读取实例，调用 Solver，输出路径、成本、状态、下界、gap、节点数。 |
+| `run_bpc(String input, String output)` | 读取实例，调用 Solver，输出路径、成本、状态、下界、gap、节点数和求解时间。 |
 
 ### 7.2 编译与运行
 
@@ -525,3 +527,44 @@ Results/Expected_Results.txt
 | RC101_25 | 462.1559467584 | 4 |
 
 参考文件中的 191.3、617.1、461.1 对应每条弧距离向下截断至一位小数的约定；本版保留完整距离精度，不设置另一种运行模式。
+
+## 10. visited 结构与时间对比
+
+第一阶段将 Label.visited 从 boolean[] 改为 int 位掩码；该批对照保留在下列历史记录中。算法流程、支配条件和加割策略保持一致。
+
+控制台每个算例增加 `time=...s`，结果文件末尾增加 `Solve time (s)`。计时范围为
+`Solver.solve()`（含初始路径、CPLEX、定价、分支、加割和最终检查），不包含编译、读取实例及结果写入。
+
+修改前后的首次时间、5 次运行的中位数和测量条件见
+[visited_timing.md](Results/visited_timing.md)，全部原始记录见
+[visited_timing.csv](Results/visited_timing.csv)。
+
+位掩码减少访问集合的分配、复制和逐项比较，但整体耗时仍受 CPLEX、JIT、GC 和机器负载影响，
+首次对比中 RC101_25 的中位耗时略有上升，不能据此声称所有算例都更快。
+
+## 11. cut_parity 位掩码与三版本对比
+
+当前 Label.visited 与 Label.cut_parity 均为 int。割状态复制改为整数赋值；访问某条割的客户时，
+用按位与判断原状态，用异或翻转该割对应的位；支配判断用整数相等判断全部割状态是否相同。
+割对偶值仍使用 double[]，计算方式和割顺序不变。
+
+默认每个节点仍最多保留 20 条割（含继承割），位掩码支持至多 32 条；Node_Solver 限制新增割预算，
+Pricing_Solver 拒绝超过 32 条活跃割的输入，避免 Java 移位距离回绕。
+
+三版分别为 boolean[]/boolean[]、int/boolean[]、int/int，均在同一批实验中各运行 6 次，
+轮换全部 6 种运行顺序，比较 Solver.solve() 的中位耗时。结果、车辆数、搜索节点数一致。
+
+完整测量条件与对比见 [label_masks_timing.md](Results/label_masks_timing.md)，
+54 条原始算例计时记录见 [label_masks_timing.csv](Results/label_masks_timing.csv)。
+该批测量不能与第 10 节的旧批次直接混合比较。
+
+## 12. 四组合消融对比
+
+为区分 visited 与 cut_parity 各自的作用，另增加仅 cut_parity 使用 int 的实验版本，
+将两个布尔数组、仅 visited int、仅 cut_parity int、双 int 四种组合在同一批中各运行 8 次。
+主项目仍使用双 int，本次实验没有切换默认实现。
+
+各组计时范围均为 Solver.solve()；使用轮换及反向顺序平衡先后位置，比较中位数。
+结果与测量条件见 [mask_ablation_timing.md](Results/mask_ablation_timing.md)，
+96 条原始算例时间见 [mask_ablation_timing.csv](Results/mask_ablation_timing.csv)。
+不要将不同批次的绝对时间直接拼接对比。

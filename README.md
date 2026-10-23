@@ -57,3 +57,13 @@ CPLEX 本机默认路径为 `D:\develop tools\CPlEX 20.1`。在其他电脑运�
 另一种距离约定，不能直接与本表比较。
 
 详细类、字段和方法说明见 [README_BPC.md](README_BPC.md)。
+
+## visited 位掩码与计时
+
+Label 的已访问客户集合和割奇偶状态均使用 `int` 位掩码，分别最多支持 32 名客户和 32 条活跃割；仓库不占客户位。默认每个节点仍最多保留 20 条割。
+控制台 `time=...s` 为 `Solver.solve()` 的耗时，不含编译、输入读取和结果写入。
+修改前后的时间测量见 [对比记录](Results/visited_timing.md)。
+
+三版本同批时间对比见 [label_masks_timing.md](Results/label_masks_timing.md)。
+
+仅修改 visited 与仅修改 cut_parity 的对照见 [四组合消融记录](Results/mask_ablation_timing.md)。
